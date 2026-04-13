@@ -38,6 +38,15 @@ export default async function DashboardLayout({
               <Link href="/creatives" className="text-gray-600 hover:text-gray-900">
                 Creatives
               </Link>
+              <Link href="/dashboard/compare" className="text-gray-600 hover:text-gray-900">
+                Compare
+              </Link>
+              <Link href="/dashboard/funnel" className="text-gray-600 hover:text-gray-900">
+                Funnel
+              </Link>
+              <Link href="/dashboard/health" className="text-gray-600 hover:text-gray-900">
+                Health
+              </Link>
               {(user.role === "bod" || user.role === "leader") && (
                 <Link href="/team" className="text-gray-600 hover:text-gray-900">
                   Team
@@ -50,6 +59,7 @@ export default async function DashboardLayout({
                     <Link href="/settings/kpi" className="block px-4 py-2 text-gray-600 hover:bg-gray-50">KPI Targets</Link>
                     <Link href="/settings/alerts" className="block px-4 py-2 text-gray-600 hover:bg-gray-50">Alerts</Link>
                     <Link href="/settings/brands" className="block px-4 py-2 text-gray-600 hover:bg-gray-50">Brands</Link>
+                    <Link href="/settings/clients" className="block px-4 py-2 text-gray-600 hover:bg-gray-50">Client Sharing</Link>
                     <Link href="/settings/columns" className="block px-4 py-2 text-gray-600 hover:bg-gray-50">Columns</Link>
                   </div>
                 </div>
