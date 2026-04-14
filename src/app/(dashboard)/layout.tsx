@@ -8,7 +8,13 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    // Don't redirect here — middleware handles auth.
+    // If user profile not found, sign out and redirect to login
+    const supabase = await (await import("@/lib/supabase-server")).createClient();
+    await supabase.auth.signOut();
+    redirect("/login");
+  }
 
   const roleBadge: Record<string, string> = {
     bod: "bg-purple-500/20 text-purple-300 border-purple-500/30",
