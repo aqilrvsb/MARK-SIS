@@ -80,11 +80,12 @@ export async function registerCompany(formData: FormData) {
   const existingPrefixes = (existingCompanies || []).map((c: { prefix: string }) => c.prefix);
   const prefix = generatePrefix(companyName, existingPrefixes);
 
-  // 2. Create auth user
-  const { data: authData, error: authError } = await supabase.auth.signUp({
+  // 2. Create auth user via admin (bypasses email confirmation)
+  const { data: authData, error: authError } = await admin.auth.admin.createUser({
     email,
     password,
-    options: { data: { full_name: companyName } },
+    email_confirm: true,
+    user_metadata: { full_name: companyName },
   });
 
   if (authError) return { error: authError.message };
@@ -97,7 +98,11 @@ export async function registerCompany(formData: FormData) {
     .select()
     .single();
 
-  if (companyError) return { error: companyError.message };
+  if (companyError) {
+    // Cleanup: delete auth user if company creation fails
+    await admin.auth.admin.deleteUser(authData.user.id);
+    return { error: companyError.message };
+  }
 
   // 4. Create BOD user with staff ID
   const staffId = `${prefix}B-001`;
@@ -110,7 +115,15 @@ export async function registerCompany(formData: FormData) {
     id_staff: staffId,
   });
 
-  if (profileError) return { error: profileError.message };
+  if (profileError) {
+    await admin.auth.admin.deleteUser(authData.user.id);
+    await admin.from("companies").delete().eq("id", company.id);
+    return { error: profileError.message };
+  }
+
+  // 5. Sign in to establish session
+  const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+  if (signInError) return { error: signInError.message };
 
   redirect("/dashboard");
 }
