@@ -7,11 +7,8 @@ export default function HomePage() {
       <nav className="relative z-10 flex items-center justify-between px-8 py-5 max-w-7xl mx-auto">
         <div className="text-2xl font-black tracking-tight text-gradient">MARK-SIS</div>
         <div className="flex gap-4">
-          <Link href="/login" className="px-5 py-2 text-sm font-semibold text-white/80 hover:text-white transition">
-            Staff Login
-          </Link>
-          <Link href="/login/bod" className="btn-premium px-5 py-2 text-sm font-bold rounded-lg">
-            BOD Login
+          <Link href="/login" className="btn-premium px-5 py-2 text-sm font-bold rounded-lg">
+            Login
           </Link>
         </div>
       </nav>
