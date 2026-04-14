@@ -60,7 +60,7 @@ export default function StaffLoginPage() {
                 name="staff_id"
                 required
                 className="input-premium w-full px-4 py-3 rounded-xl text-center text-lg font-bold tracking-widest uppercase"
-                placeholder="ESM-001"
+                placeholder="ID Staff"
                 style={{ letterSpacing: "3px" }}
               />
             </div>
@@ -83,12 +83,6 @@ export default function StaffLoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-500 mt-8">
-            Company admin?{" "}
-            <Link href="/login/bod" className="text-indigo-600 font-semibold hover:text-indigo-700">
-              BOD Login
-            </Link>
-          </p>
         </div>
       </div>
     </div>
