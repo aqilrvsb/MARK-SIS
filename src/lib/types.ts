@@ -3,6 +3,7 @@ export type UserRole = "bod" | "leader" | "marketer";
 export interface Company {
   id: string;
   name: string;
+  prefix: string;
   created_at: string;
   updated_at: string;
 }
@@ -14,6 +15,7 @@ export interface UserProfile {
   full_name: string;
   role: UserRole;
   leader_id: string | null;
+  id_staff: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;

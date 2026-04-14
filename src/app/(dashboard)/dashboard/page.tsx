@@ -79,6 +79,12 @@ export default async function DashboardPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-500">{company?.name} — Welcome, {user.full_name}</p>
+          {user.id_staff && (
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-xs text-gray-400">Your Staff ID:</span>
+              <code className="text-sm font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">{user.id_staff}</code>
+            </div>
+          )}
         </div>
         <div className="flex gap-3">
           {(alertCount || 0) > 0 && (

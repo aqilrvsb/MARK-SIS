@@ -153,6 +153,7 @@ export default function TeamClient({ currentUser, members, leaders }: Props) {
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
+              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Staff ID</th>
               <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Name</th>
               <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Email</th>
               <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Role</th>
@@ -168,6 +169,7 @@ export default function TeamClient({ currentUser, members, leaders }: Props) {
               const leader = leaders.find((l) => l.id === member.leader_id);
               return (
                 <tr key={member.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-sm font-mono font-bold text-indigo-600">{member.id_staff || "—"}</td>
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">{member.full_name}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{member.email}</td>
                   <td className="px-6 py-4">
