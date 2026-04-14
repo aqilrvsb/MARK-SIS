@@ -76,6 +76,7 @@ export default async function DashboardLayout({
               <NavLink href="/settings/alerts" label="Alerts" icon="&#9888;" />
               <NavLink href="/settings/brands" label="Brands" icon="&#9881;" />
               <NavLink href="/settings/columns" label="Columns" icon="&#9783;" />
+              <NavLink href="/settings/custom-columns" label="Custom Columns" icon="&#9997;" />
               <NavLink href="/settings/clients" label="Client Sharing" icon="&#128279;" />
             </>
           )}
