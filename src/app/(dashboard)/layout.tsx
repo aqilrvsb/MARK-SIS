@@ -52,7 +52,6 @@ export default async function DashboardLayout({
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider px-3 mb-2">Overview</p>
           <NavLink href="/dashboard" label="Dashboard" icon="&#9632;" />
-          <NavLink href="/dashboard/compare" label="Compare" icon="&#8644;" />
 
           <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider px-3 mt-5 mb-2">Reports</p>
           <NavLink href="/reports/all" label="Report All" icon="&#9776;" />
