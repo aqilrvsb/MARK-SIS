@@ -53,8 +53,7 @@ export default function StaffLoginPage() {
         <div className="w-full max-w-md animate-fade-up">
           <div className="text-center mb-8">
             <div className="lg:hidden text-3xl font-black text-gradient mb-2">Hack Data</div>
-            <h1 className="text-2xl font-bold text-gray-900">Staff Login</h1>
-            <p className="text-gray-500 mt-1">For Leaders & Marketers</p>
+            <h1 className="text-2xl font-bold text-gray-900">Login</h1>
           </div>
 
           {error && (

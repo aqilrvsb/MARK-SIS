@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase-browser";
-import { getFormulaHelp } from "@/lib/formula";
 
 interface CustomColumn {
   id: string;
@@ -17,28 +16,71 @@ interface CustomColumn {
 interface FbColumn {
   key: string;
   label: string;
-  category: string;
 }
 
 export default function CustomColumnsClient({ companyId }: { companyId: string }) {
   const [columns, setColumns] = useState<CustomColumn[]>([]);
-  const [fbColumns, setFbColumns] = useState<FbColumn[]>([]);
+  const [checkedColumns, setCheckedColumns] = useState<FbColumn[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const [formula, setFormula] = useState("");
+  const formulaRef = useRef<HTMLInputElement>(null);
 
   const supabase = createClient();
 
   useEffect(() => { loadData(); }, []);
 
   async function loadData() {
-    const [{ data: custom }, { data: fb }] = await Promise.all([
+    const [{ data: custom }, { data: allFb }, { data: colView }] = await Promise.all([
       supabase.from("custom_columns").select("*").eq("company_id", companyId).order("created_at"),
-      supabase.from("fb_columns").select("key, label, category").order("category").order("label"),
+      supabase.from("fb_columns").select("key, label").order("label"),
+      supabase.from("company_column_views").select("column_order").eq("company_id", companyId).eq("is_default", true).maybeSingle(),
     ]);
+
     setColumns((custom || []).map(c => ({ ...c, is_active: c.is_active ?? true })));
-    setFbColumns(fb || []);
+
+    // Only show columns that are checked in default view
+    const checkedKeys = (colView?.column_order as string[]) || [];
+    const filtered = (allFb || []).filter(c => checkedKeys.includes(c.key));
+    setCheckedColumns(filtered);
+  }
+
+  function insertIntoFormula(key: string) {
+    const insertion = `{${key}}`;
+    const input = formulaRef.current;
+    if (input) {
+      const start = input.selectionStart || formula.length;
+      const end = input.selectionEnd || formula.length;
+      const newFormula = formula.slice(0, start) + insertion + formula.slice(end);
+      setFormula(newFormula);
+      // Set cursor after insertion
+      setTimeout(() => {
+        input.focus();
+        const newPos = start + insertion.length;
+        input.setSelectionRange(newPos, newPos);
+      }, 0);
+    } else {
+      setFormula(formula + insertion);
+    }
+  }
+
+  function insertOperator(op: string) {
+    const input = formulaRef.current;
+    if (input) {
+      const start = input.selectionStart || formula.length;
+      const end = input.selectionEnd || formula.length;
+      const newFormula = formula.slice(0, start) + ` ${op} ` + formula.slice(end);
+      setFormula(newFormula);
+      setTimeout(() => {
+        input.focus();
+        const newPos = start + op.length + 2;
+        input.setSelectionRange(newPos, newPos);
+      }, 0);
+    } else {
+      setFormula(formula + ` ${op} `);
+    }
   }
 
   async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
@@ -47,26 +89,16 @@ export default function CustomColumnsClient({ companyId }: { companyId: string }
     setError("");
     const form = new FormData(e.currentTarget);
     const label = (form.get("label") as string).trim();
-    const formula = (form.get("formula") as string).trim();
     const key = `custom_${label.toLowerCase().replace(/[^a-z0-9]/g, "_")}`;
 
     if (!label || !formula) { setError("Name and formula are required"); setLoading(false); return; }
 
     const { error: insertError } = await supabase.from("custom_columns").insert({
-      company_id: companyId,
-      key,
-      label,
-      formula,
-      data_type: "number",
+      company_id: companyId, key, label, formula, data_type: "number",
     });
 
-    if (insertError) {
-      setError(insertError.message);
-    } else {
-      setShowForm(false);
-      (e.target as HTMLFormElement).reset();
-      loadData();
-    }
+    if (insertError) { setError(insertError.message); }
+    else { setShowForm(false); setFormula(""); loadData(); }
     setLoading(false);
   }
 
@@ -76,24 +108,24 @@ export default function CustomColumnsClient({ companyId }: { companyId: string }
   }
 
   async function handleDelete(id: string, label: string) {
-    if (!confirm(`Delete custom column "${label}"?`)) return;
+    if (!confirm(`Delete "${label}"?`)) return;
     await supabase.from("custom_columns").delete().eq("id", id);
     loadData();
   }
 
-  const filteredFb = fbColumns.filter(c =>
+  const filteredCols = checkedColumns.filter(c =>
     c.key.toLowerCase().includes(search.toLowerCase()) ||
     c.label.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="dashboard-header px-6 py-5 mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Custom Columns</h1>
-          <p className="text-gray-500">Create calculated columns with formulas</p>
+          <h1 className="text-2xl font-bold"><span className="text-gradient">Custom Columns</span></h1>
+          <p className="text-gray-500 text-sm">Create calculated columns with formulas</p>
         </div>
-        <button onClick={() => setShowForm(!showForm)}
+        <button onClick={() => { setShowForm(!showForm); setError(""); setFormula(""); }}
           className="btn-premium px-4 py-2 text-white font-semibold rounded-lg text-sm">
           {showForm ? "Cancel" : "+ New Custom Column"}
         </button>
@@ -101,85 +133,100 @@ export default function CustomColumnsClient({ companyId }: { companyId: string }
 
       {/* Create Form */}
       {showForm && (
-        <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-purple-100 p-6 mb-6">
           {error && <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">{error}</div>}
 
           <form onSubmit={handleCreate} className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Column Name</label>
               <input type="text" name="label" required placeholder="e.g. Cost Per Lead"
-                className="input-premium w-full px-4 py-2 rounded-lg text-sm" />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Formula</label>
-              <input type="text" name="formula" required
-                placeholder="e.g. {spend} / {actions:lead}"
-                className="input-premium w-full px-4 py-2 rounded-lg text-sm font-mono" />
-              <p className="text-xs text-gray-400 mt-1">
-                Use <code className="bg-gray-100 px-1 rounded">{"{column_key}"}</code> to reference columns.
-                Supports <code className="bg-gray-100 px-1 rounded">+ - * / ()</code> and numbers.
-              </p>
+                className="input-premium w-full px-4 py-2.5 rounded-xl text-sm" />
             </div>
 
-            {/* Column Key Reference */}
-            <div className="border rounded-lg p-3 bg-gray-50">
-              <p className="text-xs font-semibold text-gray-500 mb-2">Available Column Keys (click to copy)</p>
-              <input type="text" placeholder="Search columns..." value={search} onChange={e => setSearch(e.target.value)}
-                className="w-full px-3 py-1.5 border rounded text-xs mb-2" />
-              <div className="max-h-40 overflow-y-auto space-y-0.5">
-                {filteredFb.slice(0, 30).map(c => (
-                  <button key={c.key} type="button"
-                    onClick={() => navigator.clipboard.writeText(`{${c.key}}`)}
-                    className="block w-full text-left px-2 py-1 text-xs rounded hover:bg-indigo-50 hover:text-indigo-700">
-                    <code className="text-indigo-600">{`{${c.key}}`}</code>
-                    <span className="text-gray-400 ml-2">{c.label}</span>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Formula</label>
+              <input type="text" ref={formulaRef} value={formula} onChange={e => setFormula(e.target.value)}
+                placeholder="Click columns below to build formula"
+                className="input-premium w-full px-4 py-2.5 rounded-xl text-sm font-mono" />
+
+              {/* Operator buttons */}
+              <div className="flex gap-2 mt-2">
+                {["+", "-", "*", "/", "(", ")"].map(op => (
+                  <button key={op} type="button" onClick={() => insertOperator(op)}
+                    className="w-10 h-8 rounded-lg bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-purple-700 font-bold text-sm transition-all border border-gray-200 hover:border-purple-300">
+                    {op}
                   </button>
                 ))}
+                <button type="button" onClick={() => setFormula("")}
+                  className="px-3 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 text-xs font-semibold transition-all border border-red-200">
+                  Clear
+                </button>
               </div>
             </div>
 
-            <button type="submit" disabled={loading}
-              className="btn-premium px-6 py-2 text-white font-semibold rounded-lg text-sm disabled:opacity-50">
+            {/* Available Columns — only checked defaults */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Available Columns
+                <span className="text-xs text-gray-400 font-normal ml-2">({checkedColumns.length} checked columns — click to insert)</span>
+              </label>
+              <input type="text" placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)}
+                className="input-premium w-full px-3 py-2 rounded-lg text-xs mb-3" />
+
+              {checkedColumns.length === 0 ? (
+                <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-xl text-sm">
+                  No columns checked. Go to <a href="/settings/columns" className="font-bold underline">Columns</a> to select default columns first.
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-1">
+                  {filteredCols.map(c => (
+                    <button key={c.key} type="button" onClick={() => insertIntoFormula(c.key)}
+                      className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 hover:border-purple-400 hover:shadow-md transition-all cursor-pointer">
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <button type="submit" disabled={loading || !formula}
+              className="btn-premium w-full py-3 text-white font-bold rounded-xl text-sm disabled:opacity-50">
               {loading ? "Creating..." : "Create Custom Column"}
             </button>
           </form>
-
-          <pre className="mt-4 text-xs text-gray-400 bg-gray-50 p-3 rounded">{getFormulaHelp()}</pre>
         </div>
       )}
 
       {/* Existing Custom Columns */}
       <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b">
+        <table className="w-full table-premium">
+          <thead>
             <tr>
               <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Active</th>
               <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Name</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Key</th>
               <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Formula</th>
               <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {columns.map(col => (
-              <tr key={col.id} className={`hover:bg-gray-50 ${!col.is_active ? "opacity-50" : ""}`}>
+              <tr key={col.id} className={`hover:bg-purple-50/30 ${!col.is_active ? "opacity-40" : ""}`}>
                 <td className="px-6 py-4">
                   <button onClick={() => toggleActive(col.id, col.is_active)}
-                    className={`w-10 h-5 rounded-full relative transition-colors ${col.is_active ? "bg-indigo-500" : "bg-gray-300"}`}>
-                    <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${col.is_active ? "left-5" : "left-0.5"}`} />
+                    className={`w-11 h-6 rounded-full relative transition-all ${col.is_active ? "bg-gradient-to-r from-purple-500 to-pink-500" : "bg-gray-300"}`}>
+                    <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${col.is_active ? "left-5" : "left-0.5"}`} />
                   </button>
                 </td>
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">{col.label}</td>
-                <td className="px-6 py-4 text-sm font-mono text-gray-500">{col.key}</td>
-                <td className="px-6 py-4 text-sm font-mono text-indigo-600">{col.formula || "—"}</td>
+                <td className="px-6 py-4 text-sm font-semibold text-gray-900">{col.label}</td>
+                <td className="px-6 py-4 text-sm font-mono text-purple-600">{col.formula || "—"}</td>
                 <td className="px-6 py-4 text-right">
                   <button onClick={() => handleDelete(col.id, col.label)}
-                    className="text-red-500 hover:text-red-700 text-sm">Delete</button>
+                    className="text-red-400 hover:text-red-600 text-sm font-semibold transition-colors">Delete</button>
                 </td>
               </tr>
             ))}
             {columns.length === 0 && (
-              <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-400">No custom columns yet. Create one above.</td></tr>
+              <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-400">No custom columns yet.</td></tr>
             )}
           </tbody>
         </table>

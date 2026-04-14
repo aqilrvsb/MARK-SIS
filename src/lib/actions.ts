@@ -172,7 +172,13 @@ export async function loginWithStaffId(formData: FormData) {
     password,
   });
 
-  if (error) return { error: "Wrong password. Try again." };
+  if (error) {
+    // If email mismatch (old vs new domain), try updating and retry
+    if (error.message.includes("Invalid login")) {
+      return { error: "Wrong password or account issue. Contact admin to recreate your account." };
+    }
+    return { error: error.message };
+  }
 
   redirect("/dashboard");
 }
