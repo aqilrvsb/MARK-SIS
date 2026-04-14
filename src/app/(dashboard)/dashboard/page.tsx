@@ -41,13 +41,15 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500">{company?.name} — Welcome, {user.full_name}</p>
+      <div className="dashboard-header px-6 py-5 mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">
+          <span className="text-gradient">Dashboard</span>
+        </h1>
+        <p className="text-gray-500 mt-0.5">{company?.name} — Welcome, {user.full_name}</p>
         {user.id_staff && (
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center gap-2 mt-1.5">
             <span className="text-xs text-gray-400">Your Staff ID:</span>
-            <code className="text-sm font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">{user.id_staff}</code>
+            <code className="text-sm font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent bg-purple-50 px-2 py-0.5 rounded border border-purple-100">{user.id_staff}</code>
           </div>
         )}
       </div>
