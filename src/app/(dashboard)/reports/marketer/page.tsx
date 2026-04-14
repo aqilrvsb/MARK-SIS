@@ -3,6 +3,7 @@ import { createServiceClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import ReportView from "@/components/report-view";
 import PageCharts from "@/components/page-charts";
+import { filterByRole } from "@/lib/filter-by-role";
 
 export default async function ReportMarketerPage() {
   const user = await getCurrentUser();
@@ -22,33 +23,27 @@ export default async function ReportMarketerPage() {
   const availableMetrics = [
     ...(fbRes.data?.filter(c => selectedCols.includes(c.key)) || []),
     ...(customRes.data || []).map(c => ({ key: c.key, label: c.label })),
-    { key: "spend", label: "Spend" },
-    { key: "impressions", label: "Impressions" },
-    { key: "clicks", label: "Clicks" },
   ].filter((m, i, arr) => arr.findIndex(x => x.key === m.key) === i);
 
   type ChartConfig = { id: number; title: string; metric1: string; metric2: string };
   const savedCharts = (chartConfigRes.data?.setting_value as ChartConfig[] | undefined) ?? null;
 
+  const roleData = filterByRole(adRes.data || [], user, teamRes.data || []);
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Report by Marketer</h1>
       <PageCharts
-        pageKey="report_marketer"
-        companyId={user.company_id}
-        isBod={user.role === "bod"}
-        adData={(adRes.data || []).map(row => ({ data: row.data as Record<string, unknown>, date_start: row.date_start as string }))}
+        pageKey="report_marketer" companyId={user.company_id} isBod={user.role === "bod"}
+        adData={roleData.map(r => ({ data: r.data as Record<string, unknown>, date_start: r.date_start }))}
         availableMetrics={availableMetrics}
         customColumns={(customRes.data || []).map(c => ({ key: c.key, label: c.label, formula: c.formula }))}
         savedCharts={savedCharts}
       />
       <ReportView
-        adData={adRes.data || []}
-        selectedColumns={(colRes.data?.column_order as string[]) || []}
-        customColumns={customRes.data || []}
-        fbColumns={fbRes.data || []}
-        teamMembers={teamRes.data || []}
-        groupBy="marketer"
+        adData={roleData} selectedColumns={selectedCols}
+        customColumns={customRes.data || []} fbColumns={fbRes.data || []}
+        teamMembers={teamRes.data || []} groupBy="marketer"
       />
     </div>
   );

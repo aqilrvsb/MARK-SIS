@@ -62,7 +62,6 @@ export default async function DashboardLayout({
             <>
               <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider px-3 mt-5 mb-2">Manage</p>
               <NavLink href="/team" label="Team" icon="&#128101;" />
-              <NavLink href="/dashboard/import" label="Import Data" icon="&#8682;" />
             </>
           )}
 

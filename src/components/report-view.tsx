@@ -67,8 +67,9 @@ const SUMMABLE_KEYS: Record<string, { format: "number" | "currency" | "percentag
 export default function ReportView({
   adData, selectedColumns, customColumns, fbColumns, groupBy = "none", teamMembers,
 }: ReportViewProps) {
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const today = new Date().toISOString().split("T")[0];
+  const [startDate, setStartDate] = useState(today);
+  const [endDate, setEndDate] = useState(today);
 
   // Column label map
   const colLabelMap = new Map(fbColumns.map(c => [c.key, c.label]));
