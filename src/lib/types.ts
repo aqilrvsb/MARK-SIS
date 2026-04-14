@@ -16,6 +16,7 @@ export interface UserProfile {
   role: UserRole;
   leader_id: string | null;
   id_staff: string;
+  whatsapp_number: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;

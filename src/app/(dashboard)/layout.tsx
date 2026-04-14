@@ -59,12 +59,6 @@ export default async function DashboardLayout({
           <NavLink href="/reports/leader" label="Report Leader" icon="&#9733;" />
           <NavLink href="/reports/marketer" label="Report Marketer" icon="&#9998;" />
 
-          <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider px-3 mt-5 mb-2">Analytics</p>
-          <NavLink href="/scorecard" label="Scorecard" icon="&#9733;" />
-          <NavLink href="/creatives" label="Creatives" icon="&#9998;" />
-          <NavLink href="/dashboard/funnel" label="Funnel" icon="&#9660;" />
-          <NavLink href="/dashboard/health" label="Health" icon="&#9829;" />
-
           {(user.role === "bod" || user.role === "leader") && (
             <>
               <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider px-3 mt-5 mb-2">Manage</p>
@@ -76,12 +70,8 @@ export default async function DashboardLayout({
           {user.role === "bod" && (
             <>
               <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider px-3 mt-5 mb-2">Settings</p>
-              <NavLink href="/settings/kpi" label="KPI Targets" icon="&#127919;" />
-              <NavLink href="/settings/alerts" label="Alerts" icon="&#9888;" />
-              <NavLink href="/settings/brands" label="Brands" icon="&#9881;" />
               <NavLink href="/settings/columns" label="Columns" icon="&#9783;" />
               <NavLink href="/settings/custom-columns" label="Custom Columns" icon="&#9997;" />
-              <NavLink href="/settings/clients" label="Client Sharing" icon="&#128279;" />
             </>
           )}
         </nav>

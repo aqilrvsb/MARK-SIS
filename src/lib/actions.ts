@@ -251,7 +251,8 @@ export async function createTeamMember(formData: FormData) {
 
   if (authError) return { error: authError.message };
 
-  // Create profile with staff ID
+  // Create profile with staff ID + whatsapp
+  const whatsappNumber = (formData.get("whatsapp_number") as string)?.trim() || null;
   const { error: profileError } = await admin.from("users").insert({
     id: authData.user.id,
     company_id: currentUser.company_id,
@@ -260,6 +261,7 @@ export async function createTeamMember(formData: FormData) {
     role,
     id_staff: staffId,
     leader_id: role === "marketer" ? (leaderId || currentUser.id) : null,
+    whatsapp_number: whatsappNumber,
   });
 
   if (profileError) return { error: profileError.message };
@@ -274,10 +276,13 @@ export async function updateTeamMember(userId: string, formData: FormData) {
   const isActive = formData.get("is_active") === "true";
   const leaderId = (formData.get("leader_id") as string) || null;
 
+  const whatsappNumber = (formData.get("whatsapp_number") as string)?.trim() || null;
+
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
   if (fullName) updates.full_name = fullName;
   if (formData.has("is_active")) updates.is_active = isActive;
   if (formData.has("leader_id")) updates.leader_id = leaderId || null;
+  if (formData.has("whatsapp_number")) updates.whatsapp_number = whatsappNumber;
 
   const { error } = await admin.from("users").update(updates).eq("id", userId);
 
