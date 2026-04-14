@@ -200,13 +200,16 @@ export default function ReportView({
 
       {/* Report Sections */}
       {groups.map((group, gi) => {
+        if (group.rows.length === 0) return null; // Hide empty sections entirely
         const boxes = getSummaryBoxes(group.rows);
         return (
           <div key={gi} className="mb-8">
-            <div className="flex items-center gap-3 mb-3">
-              <h2 className="text-lg font-bold text-gray-800">{group.title}</h2>
-              {group.staffId && <code className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">{group.staffId}</code>}
-            </div>
+            {groupBy !== "none" && (
+              <div className="flex items-center gap-3 mb-3">
+                <h2 className="text-lg font-bold text-gray-800">{group.title}</h2>
+                {group.staffId && <code className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">{group.staffId}</code>}
+              </div>
+            )}
 
             {/* Summary Boxes — only checked columns */}
             {boxes.length > 0 && (
@@ -261,9 +264,6 @@ export default function ReportView({
               </div>
             )}
 
-            {group.rows.length === 0 && (
-              <div className="bg-white rounded-xl border p-8 text-center text-gray-400 text-sm">No data.</div>
-            )}
           </div>
         );
       })}

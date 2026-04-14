@@ -70,6 +70,7 @@ export default async function DashboardLayout({
               <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider px-3 mt-5 mb-2">Settings</p>
               <NavLink href="/settings/columns" label="Columns" icon="&#9783;" />
               <NavLink href="/settings/custom-columns" label="Custom Columns" icon="&#9997;" />
+              <NavLink href="/settings/charts" label="Charts" icon="&#128200;" />
             </>
           )}
         </nav>
