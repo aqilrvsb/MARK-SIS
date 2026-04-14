@@ -12,7 +12,7 @@ interface Props {
 }
 
 export default function TeamClient({ currentUser, members, leaders }: Props) {
-  const [tab, setTab] = useState<"leader" | "marketer">("leader");
+  const [tab, setTab] = useState<"leader" | "marketer">(currentUser.role === "bod" ? "leader" : "marketer");
   const [showCreate, setShowCreate] = useState(false);
   const [editUser, setEditUser] = useState<UserProfile | null>(null);
   const [error, setError] = useState("");
@@ -70,10 +70,14 @@ export default function TeamClient({ currentUser, members, leaders }: Props) {
     else router.refresh();
   }
 
-  const tabs = [
-    { id: "leader" as const, label: "Leaders", count: leaderList.length },
-    { id: "marketer" as const, label: "Marketers", count: marketerList.length },
-  ];
+  const tabs = currentUser.role === "bod"
+    ? [
+        { id: "leader" as const, label: "Leaders", count: leaderList.length },
+        { id: "marketer" as const, label: "Marketers", count: marketerList.length },
+      ]
+    : [
+        { id: "marketer" as const, label: "Marketers", count: marketerList.length },
+      ];
 
   return (
     <div>
