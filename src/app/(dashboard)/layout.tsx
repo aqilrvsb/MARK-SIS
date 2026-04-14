@@ -102,7 +102,7 @@ export default async function DashboardLayout({
 
 function NavLink({ href, label, icon }: { href: string; label: string; icon: string }) {
   return (
-    <Link href={href} className="sidebar-link">
+    <Link href={href} prefetch={true} className="sidebar-link">
       <span className="text-base w-5 text-center">{icon}</span>
       <span>{label}</span>
     </Link>

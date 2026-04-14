@@ -33,7 +33,7 @@ export default function ColumnsClient({ companyId }: { companyId: string }) {
       .select("column_order")
       .eq("company_id", companyId)
       .eq("is_default", true)
-      .single();
+      .maybeSingle();
 
     if (view?.column_order) {
       setSelected(view.column_order as string[]);
