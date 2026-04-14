@@ -10,11 +10,8 @@ export default function HomePage() {
           <Link href="/login" className="px-5 py-2 text-sm font-semibold text-white/80 hover:text-white transition">
             Staff Login
           </Link>
-          <Link href="/login/bod" className="px-5 py-2 text-sm font-semibold text-white/80 hover:text-white transition">
+          <Link href="/login/bod" className="btn-premium px-5 py-2 text-sm font-bold rounded-lg">
             BOD Login
-          </Link>
-          <Link href="/register" className="btn-premium px-5 py-2 text-sm font-bold rounded-lg">
-            Register Company
           </Link>
         </div>
       </nav>
