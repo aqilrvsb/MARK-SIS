@@ -118,7 +118,7 @@ async function calculateScores(
   // Aggregate metrics
   let totalSpend = 0, totalImpressions = 0, totalClicks = 0;
   let totalLeads = 0, totalPurchases = 0, totalRevenue = 0;
-  let campaignsSet = new Set<string>();
+  const campaignsSet = new Set<string>();
 
   for (const row of adRows) {
     const d = row.data as Record<string, unknown>;
