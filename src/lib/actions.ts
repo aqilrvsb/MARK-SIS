@@ -213,8 +213,9 @@ export async function createTeamMember(formData: FormData) {
   const password = formData.get("password") as string;
   const role = formData.get("role") as string;
   const leaderId = (formData.get("leader_id") as string) || null;
+  const staffId = (formData.get("id_staff") as string)?.toUpperCase().trim();
 
-  if (!fullName || !email || !password || !role) {
+  if (!fullName || !email || !password || !role || !staffId) {
     return { error: "All fields are required" };
   }
 
@@ -225,17 +226,16 @@ export async function createTeamMember(formData: FormData) {
     return { error: "Marketers cannot create users" };
   }
 
-  // Get company prefix
-  const { data: company } = await admin
-    .from("companies")
-    .select("prefix")
-    .eq("id", currentUser.company_id)
-    .single();
+  // Check staff ID uniqueness
+  const { data: existing } = await admin
+    .from("users")
+    .select("id")
+    .eq("id_staff", staffId)
+    .maybeSingle();
 
-  if (!company?.prefix) return { error: "Company prefix not found" };
-
-  // Generate staff ID
-  const staffId = await generateStaffId(admin, currentUser.company_id, company.prefix, role);
+  if (existing) {
+    return { error: `Staff ID "${staffId}" already exists. Choose a different one.` };
+  }
 
   // Create auth user
   const { data: authData, error: authError } = await admin.auth.admin.createUser({
