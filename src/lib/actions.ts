@@ -104,15 +104,13 @@ export async function registerCompany(formData: FormData) {
     return { error: companyError.message };
   }
 
-  // 4. Create BOD user with staff ID
-  const staffId = `${prefix}B-001`;
+  // 4. Create BOD user (no staff ID for BOD)
   const { error: profileError } = await admin.from("users").insert({
     id: authData.user.id,
     company_id: company.id,
     email,
     full_name: companyName,
     role: "bod",
-    id_staff: staffId,
   });
 
   if (profileError) {
@@ -137,6 +135,43 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) return { error: error.message };
+
+  redirect("/dashboard");
+}
+
+export async function loginWithStaffId(formData: FormData) {
+  const supabase = await createClient();
+  const admin = createServiceClient();
+
+  const staffId = (formData.get("staff_id") as string)?.toUpperCase().trim();
+  const password = formData.get("password") as string;
+
+  if (!staffId || !password) {
+    return { error: "Staff ID and password are required" };
+  }
+
+  // Look up email by staff ID
+  const { data: user, error: lookupError } = await admin
+    .from("users")
+    .select("email, is_active")
+    .eq("id_staff", staffId)
+    .single();
+
+  if (lookupError || !user) {
+    return { error: "Invalid Staff ID. Contact your admin." };
+  }
+
+  if (!user.is_active) {
+    return { error: "Account is deactivated. Contact your admin." };
+  }
+
+  // Sign in with email + password
+  const { error } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password,
+  });
+
+  if (error) return { error: "Wrong password. Try again." };
 
   redirect("/dashboard");
 }

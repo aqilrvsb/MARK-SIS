@@ -13,8 +13,10 @@ export async function middleware(request: NextRequest) {
   if (
     path === "/" ||
     path === "/login" ||
+    path.startsWith("/login/") ||
     path === "/register" ||
     path.startsWith("/api/auth") ||
+    path.startsWith("/api/extension/") ||
     path.startsWith("/shared/")
   ) {
     // Still refresh session for logged-in users on public pages
@@ -38,7 +40,7 @@ export async function middleware(request: NextRequest) {
       const { data: { user } } = await supabase.auth.getUser();
 
       // Redirect logged-in users away from login/register
-      if (user && (path === "/login" || path === "/register")) {
+      if (user && (path === "/login" || path.startsWith("/login/") || path === "/register")) {
         return NextResponse.redirect(new URL("/dashboard", request.url));
       }
 

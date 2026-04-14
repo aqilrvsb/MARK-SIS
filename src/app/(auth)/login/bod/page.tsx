@@ -1,10 +1,10 @@
 "use client";
 
-import { loginWithStaffId } from "@/lib/actions";
+import { login } from "@/lib/actions";
 import Link from "next/link";
 import { useState } from "react";
 
-export default function StaffLoginPage() {
+export default function BODLoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -13,7 +13,7 @@ export default function StaffLoginPage() {
     setLoading(true);
     setError("");
     const formData = new FormData(e.currentTarget);
-    const result = await loginWithStaffId(formData);
+    const result = await login(formData);
     if (result?.error) {
       setError(result.error);
       setLoading(false);
@@ -28,11 +28,11 @@ export default function StaffLoginPage() {
         <div className="relative z-10 text-white max-w-md">
           <div className="text-5xl font-black tracking-tight mb-6">MARK-SIS</div>
           <p className="text-2xl font-light text-white/90 leading-relaxed">
-            Your marketing command center.
+            Company Admin Portal
           </p>
           <p className="text-white/60 mt-4 text-sm leading-relaxed">
-            Track 238+ Facebook Ads metrics, manage your team, set KPI targets,
-            and get automated alerts — all in one beautiful dashboard.
+            Manage your entire marketing team, configure KPI targets,
+            set up alert rules, and oversee all campaign performance.
           </p>
         </div>
       </div>
@@ -42,8 +42,8 @@ export default function StaffLoginPage() {
         <div className="w-full max-w-md animate-fade-up">
           <div className="text-center mb-8">
             <div className="lg:hidden text-3xl font-black text-gradient mb-2">MARK-SIS</div>
-            <h1 className="text-2xl font-bold text-gray-900">Staff Login</h1>
-            <p className="text-gray-500 mt-1">For Leaders & Marketers</p>
+            <h1 className="text-2xl font-bold text-gray-900">Company Login</h1>
+            <p className="text-gray-500 mt-1">For Board of Directors</p>
           </div>
 
           {error && (
@@ -54,14 +54,13 @@ export default function StaffLoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Staff ID</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
               <input
-                type="text"
-                name="staff_id"
+                type="email"
+                name="email"
                 required
-                className="input-premium w-full px-4 py-3 rounded-xl text-center text-lg font-bold tracking-widest uppercase"
-                placeholder="ESM-001"
-                style={{ letterSpacing: "3px" }}
+                className="input-premium w-full px-4 py-3 rounded-xl text-sm"
+                placeholder="admin@company.com"
               />
             </div>
             <div>
@@ -83,12 +82,20 @@ export default function StaffLoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-500 mt-8">
-            Company admin?{" "}
-            <Link href="/login/bod" className="text-indigo-600 font-semibold hover:text-indigo-700">
-              BOD Login
-            </Link>
-          </p>
+          <div className="text-center text-sm text-gray-500 mt-8 space-y-2">
+            <p>
+              Staff member?{" "}
+              <Link href="/login" className="text-indigo-600 font-semibold hover:text-indigo-700">
+                Staff Login
+              </Link>
+            </p>
+            <p>
+              New company?{" "}
+              <Link href="/register" className="text-indigo-600 font-semibold hover:text-indigo-700">
+                Register
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

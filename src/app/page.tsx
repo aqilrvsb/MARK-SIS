@@ -8,10 +8,13 @@ export default function HomePage() {
         <div className="text-2xl font-black tracking-tight text-gradient">MARK-SIS</div>
         <div className="flex gap-4">
           <Link href="/login" className="px-5 py-2 text-sm font-semibold text-white/80 hover:text-white transition">
-            Sign In
+            Staff Login
+          </Link>
+          <Link href="/login/bod" className="px-5 py-2 text-sm font-semibold text-white/80 hover:text-white transition">
+            BOD Login
           </Link>
           <Link href="/register" className="btn-premium px-5 py-2 text-sm font-bold rounded-lg">
-            Start Free
+            Register Company
           </Link>
         </div>
       </nav>
