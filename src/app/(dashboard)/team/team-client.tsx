@@ -286,6 +286,10 @@ export default function TeamClient({ currentUser, members, leaders }: Props) {
                 <label className="block text-sm font-semibold text-gray-700 mb-1">WhatsApp Number</label>
                 <input type="text" name="whatsapp_number" defaultValue={editUser.whatsapp_number || ""} className="input-premium w-full px-4 py-2.5 rounded-xl text-sm" placeholder="60123456789" />
               </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">New Password <span className="text-xs text-gray-400 font-normal">(leave empty to keep current)</span></label>
+                <input type="password" name="new_password" minLength={6} className="input-premium w-full px-4 py-2.5 rounded-xl text-sm" placeholder="Enter new password" />
+              </div>
               {editUser.role === "marketer" && leaders.length > 0 && (
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Assign to Leader</label>

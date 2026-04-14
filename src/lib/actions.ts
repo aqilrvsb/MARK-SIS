@@ -291,8 +291,17 @@ export async function updateTeamMember(userId: string, formData: FormData) {
   if (formData.has("whatsapp_number")) updates.whatsapp_number = whatsappNumber;
 
   const { error } = await admin.from("users").update(updates).eq("id", userId);
-
   if (error) return { error: error.message };
+
+  // Update password if provided
+  const newPassword = (formData.get("new_password") as string)?.trim();
+  if (newPassword && newPassword.length >= 6) {
+    const { error: pwError } = await admin.auth.admin.updateUserById(userId, {
+      password: newPassword,
+    });
+    if (pwError) return { error: "Profile updated but password failed: " + pwError.message };
+  }
+
   return { success: true };
 }
 
