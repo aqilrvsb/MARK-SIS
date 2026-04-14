@@ -10,78 +10,95 @@ export default async function DashboardLayout({
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const roleBadge = {
-    bod: "bg-purple-100 text-purple-700",
-    leader: "bg-blue-100 text-blue-700",
-    marketer: "bg-green-100 text-green-700",
+  const roleBadge: Record<string, string> = {
+    bod: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+    leader: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+    marketer: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Top Nav */}
-      <nav className="bg-white border-b border-gray-200 px-6 py-3">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center gap-6">
-            <Link href="/dashboard" className="text-lg font-bold text-blue-600">
-              MARK-SIS
-            </Link>
-            <div className="flex gap-4 text-sm">
-              <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
-                Dashboard
-              </Link>
-              <Link href="/dashboard/reports" className="text-gray-600 hover:text-gray-900">
-                Reports
-              </Link>
-              <Link href="/scorecard" className="text-gray-600 hover:text-gray-900">
-                Scorecard
-              </Link>
-              <Link href="/creatives" className="text-gray-600 hover:text-gray-900">
-                Creatives
-              </Link>
-              <Link href="/dashboard/compare" className="text-gray-600 hover:text-gray-900">
-                Compare
-              </Link>
-              <Link href="/dashboard/funnel" className="text-gray-600 hover:text-gray-900">
-                Funnel
-              </Link>
-              <Link href="/dashboard/health" className="text-gray-600 hover:text-gray-900">
-                Health
-              </Link>
-              {(user.role === "bod" || user.role === "leader") && (
-                <Link href="/team" className="text-gray-600 hover:text-gray-900">
-                  Team
-                </Link>
-              )}
-              {user.role === "bod" && (
-                <div className="relative group">
-                  <span className="text-gray-600 hover:text-gray-900 cursor-pointer">Settings</span>
-                  <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border py-2 min-w-40 hidden group-hover:block z-50">
-                    <Link href="/settings/kpi" className="block px-4 py-2 text-gray-600 hover:bg-gray-50">KPI Targets</Link>
-                    <Link href="/settings/alerts" className="block px-4 py-2 text-gray-600 hover:bg-gray-50">Alerts</Link>
-                    <Link href="/settings/brands" className="block px-4 py-2 text-gray-600 hover:bg-gray-50">Brands</Link>
-                    <Link href="/settings/clients" className="block px-4 py-2 text-gray-600 hover:bg-gray-50">Client Sharing</Link>
-                    <Link href="/settings/columns" className="block px-4 py-2 text-gray-600 hover:bg-gray-50">Columns</Link>
-                  </div>
-                </div>
-              )}
+    <div className="min-h-screen flex bg-[#f1f5f9]">
+      {/* Sidebar */}
+      <aside className="w-64 bg-[#0f172a] text-white flex flex-col flex-shrink-0 fixed h-full z-40">
+        {/* Logo */}
+        <div className="px-6 py-5 border-b border-white/10">
+          <Link href="/dashboard" className="text-xl font-black tracking-tight text-gradient">
+            MARK-SIS
+          </Link>
+        </div>
+
+        {/* User Info */}
+        <div className="px-4 py-4 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 font-bold text-sm">
+              {user.full_name.charAt(0).toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-white truncate">{user.full_name}</p>
+              <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full border mt-0.5 ${roleBadge[user.role]}`}>
+                {user.role.toUpperCase()}
+              </span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <span className={`text-xs font-semibold px-2 py-1 rounded-full ${roleBadge[user.role]}`}>
-              {user.role.toUpperCase()}
-            </span>
-            <span className="text-sm text-gray-600">{user.full_name}</span>
-            <form action={logout}>
-              <button className="text-sm text-red-500 hover:text-red-700">
-                Logout
-              </button>
-            </form>
-          </div>
         </div>
-      </nav>
 
-      {/* Content */}
-      <main className="max-w-7xl mx-auto px-6 py-6">{children}</main>
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider px-3 mb-2">Overview</p>
+          <NavLink href="/dashboard" label="Dashboard" icon="&#9632;" />
+          <NavLink href="/dashboard/reports" label="Reports" icon="&#9776;" />
+          <NavLink href="/dashboard/compare" label="Compare" icon="&#8644;" />
+
+          <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider px-3 mt-5 mb-2">Analytics</p>
+          <NavLink href="/scorecard" label="Scorecard" icon="&#9733;" />
+          <NavLink href="/creatives" label="Creatives" icon="&#9998;" />
+          <NavLink href="/dashboard/funnel" label="Funnel" icon="&#9660;" />
+          <NavLink href="/dashboard/health" label="Health" icon="&#9829;" />
+
+          {(user.role === "bod" || user.role === "leader") && (
+            <>
+              <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider px-3 mt-5 mb-2">Manage</p>
+              <NavLink href="/team" label="Team" icon="&#128101;" />
+              <NavLink href="/dashboard/import" label="Import Data" icon="&#8682;" />
+            </>
+          )}
+
+          {user.role === "bod" && (
+            <>
+              <p className="text-[10px] font-bold text-white/30 uppercase tracking-wider px-3 mt-5 mb-2">Settings</p>
+              <NavLink href="/settings/kpi" label="KPI Targets" icon="&#127919;" />
+              <NavLink href="/settings/alerts" label="Alerts" icon="&#9888;" />
+              <NavLink href="/settings/brands" label="Brands" icon="&#9881;" />
+              <NavLink href="/settings/columns" label="Columns" icon="&#9783;" />
+              <NavLink href="/settings/clients" label="Client Sharing" icon="&#128279;" />
+            </>
+          )}
+        </nav>
+
+        {/* Logout */}
+        <div className="px-4 py-4 border-t border-white/10">
+          <form action={logout}>
+            <button className="w-full text-left sidebar-link text-red-400 hover:text-red-300 hover:bg-red-500/10">
+              <span>&#8592;</span>
+              <span>Sign Out</span>
+            </button>
+          </form>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 ml-64 p-8 min-h-screen">
+        {children}
+      </main>
     </div>
+  );
+}
+
+function NavLink({ href, label, icon }: { href: string; label: string; icon: string }) {
+  return (
+    <Link href={href} className="sidebar-link">
+      <span className="text-base w-5 text-center">{icon}</span>
+      <span>{label}</span>
+    </Link>
   );
 }
