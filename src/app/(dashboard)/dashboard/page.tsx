@@ -2,6 +2,7 @@ import { getCurrentUser } from "@/lib/actions";
 import { createServiceClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import PageCharts from "@/components/page-charts";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -10,12 +11,16 @@ export default async function DashboardPage() {
   const admin = createServiceClient();
 
   // Run ALL queries in parallel — much faster
-  const [companyRes, teamRes, adDataRes, alertRes, scoresRes] = await Promise.all([
+  const [companyRes, teamRes, adDataRes, alertRes, scoresRes, chartConfigRes, colRes, customRes, fbRes] = await Promise.all([
     admin.from("companies").select("name").eq("id", user.company_id).single(),
     admin.from("users").select("*", { count: "exact", head: true }).eq("company_id", user.company_id),
-    admin.from("ad_data").select("data").eq("company_id", user.company_id).limit(500),
+    admin.from("ad_data").select("data, date_start").eq("company_id", user.company_id).limit(500),
     admin.from("alert_history").select("*", { count: "exact", head: true }).eq("company_id", user.company_id).eq("is_read", false),
     admin.from("marketer_scores").select("*, users:marketer_id(full_name)").eq("company_id", user.company_id).order("total_spend", { ascending: false }).limit(10),
+    admin.from("site_settings").select("setting_value").eq("setting_key", `charts_${user.company_id}_dashboard`).maybeSingle(),
+    admin.from("company_column_views").select("column_order").eq("company_id", user.company_id).eq("is_default", true).maybeSingle(),
+    admin.from("custom_columns").select("key, label, formula").eq("company_id", user.company_id).eq("is_active", true),
+    admin.from("fb_columns").select("key, label").limit(300),
   ]);
 
   const company = companyRes.data;
@@ -23,6 +28,18 @@ export default async function DashboardPage() {
   const adData = adDataRes.data;
   const alertCount = alertRes.count;
   const scores = scoresRes.data;
+
+  const selectedCols = (colRes.data?.column_order as string[]) || [];
+  const availableMetrics = [
+    ...(fbRes.data?.filter(c => selectedCols.includes(c.key)) || []),
+    ...(customRes.data || []).map(c => ({ key: c.key, label: c.label })),
+    { key: "spend", label: "Spend" },
+    { key: "impressions", label: "Impressions" },
+    { key: "clicks", label: "Clicks" },
+  ].filter((m, i, arr) => arr.findIndex(x => x.key === m.key) === i);
+
+  type ChartConfig = { id: number; title: string; metric1: string; metric2: string };
+  const savedCharts = (chartConfigRes.data?.setting_value as ChartConfig[] | undefined) ?? null;
 
   let totalSpend = 0, totalImpressions = 0, totalClicks = 0, totalLeads = 0;
   let totalPurchases = 0, totalRevenue = 0;
@@ -100,6 +117,17 @@ export default async function DashboardPage() {
         <StatCard label="Team" value={String(teamCount || 0)} />
         <StatCard label="Records" value={String(adData?.length || 0)} />
       </div>
+
+      {/* Charts */}
+      <PageCharts
+        pageKey="dashboard"
+        companyId={user.company_id}
+        isBod={user.role === "bod"}
+        adData={(adData || []).map(row => ({ data: row.data as Record<string, unknown>, date_start: row.date_start as string }))}
+        availableMetrics={availableMetrics}
+        customColumns={(customRes.data || []).map(c => ({ key: c.key, label: c.label, formula: c.formula }))}
+        savedCharts={savedCharts}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Campaigns */}
