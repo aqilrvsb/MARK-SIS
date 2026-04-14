@@ -1,13 +1,13 @@
 import { getCurrentUser } from "@/lib/actions";
-import { createClient } from "@/lib/supabase-server";
+import { createServiceClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 
 export default async function FunnelPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const supabase = await createClient();
-  const { data: adData } = await supabase.from("ad_data").select("data");
+  const admin = createServiceClient();
+  const { data: adData } = await admin.from("ad_data").select("data").eq("company_id", user.company_id);
 
   let impressions = 0, clicks = 0, landingPageViews = 0, leads = 0, purchases = 0, revenue = 0;
 

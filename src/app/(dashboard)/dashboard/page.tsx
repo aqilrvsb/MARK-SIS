@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/actions";
-import { createClient } from "@/lib/supabase-server";
+import { createServiceClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
@@ -7,23 +7,22 @@ export default async function DashboardPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const supabase = await createClient();
+  const admin = createServiceClient();
 
-  // Company name
-  const { data: company } = await supabase
-    .from("companies")
-    .select("name")
-    .eq("id", user.company_id)
-    .single();
+  // Run ALL queries in parallel — much faster
+  const [companyRes, teamRes, adDataRes, alertRes, scoresRes] = await Promise.all([
+    admin.from("companies").select("name").eq("id", user.company_id).single(),
+    admin.from("users").select("*", { count: "exact", head: true }).eq("company_id", user.company_id),
+    admin.from("ad_data").select("data").eq("company_id", user.company_id).limit(500),
+    admin.from("alert_history").select("*", { count: "exact", head: true }).eq("company_id", user.company_id).eq("is_read", false),
+    admin.from("marketer_scores").select("*, users:marketer_id(full_name)").eq("company_id", user.company_id).order("total_spend", { ascending: false }).limit(10),
+  ]);
 
-  // Team count
-  const { count: teamCount } = await supabase
-    .from("users")
-    .select("*", { count: "exact", head: true })
-    .eq("company_id", user.company_id);
-
-  // Ad data stats
-  const { data: adData } = await supabase.from("ad_data").select("data");
+  const company = companyRes.data;
+  const teamCount = teamRes.count;
+  const adData = adDataRes.data;
+  const alertCount = alertRes.count;
+  const scores = scoresRes.data;
 
   let totalSpend = 0, totalImpressions = 0, totalClicks = 0, totalLeads = 0;
   let totalPurchases = 0, totalRevenue = 0;
@@ -43,12 +42,6 @@ export default async function DashboardPage() {
   const ctr = totalImpressions > 0 ? ((totalClicks / totalImpressions) * 100) : 0;
   const cpc = totalClicks > 0 ? (totalSpend / totalClicks) : 0;
 
-  // Alerts count
-  const { count: alertCount } = await supabase
-    .from("alert_history")
-    .select("*", { count: "exact", head: true })
-    .eq("is_read", false);
-
   // Top campaigns by spend
   const campaignMap = new Map<string, { spend: number; clicks: number; impressions: number; leads: number }>();
   (adData || []).forEach((row) => {
@@ -65,13 +58,6 @@ export default async function DashboardPage() {
   const topCampaigns = Array.from(campaignMap.entries())
     .sort((a, b) => b[1].spend - a[1].spend)
     .slice(0, 5);
-
-  // Marketer ranking
-  const { data: scores } = await supabase
-    .from("marketer_scores")
-    .select("*, users:marketer_id(full_name)")
-    .order("total_spend", { ascending: false })
-    .limit(10);
 
   return (
     <div>

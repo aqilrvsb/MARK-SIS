@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/actions";
-import { createClient } from "@/lib/supabase-server";
+import { createServiceClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
@@ -15,11 +15,12 @@ export default async function ReportsPage({
   const dateStart = params.date_start || "";
   const dateEnd = params.date_end || "";
 
-  const supabase = await createClient();
+  const admin = createServiceClient();
 
-  let query = supabase
+  let query = admin
     .from("ad_data")
     .select("*")
+    .eq("company_id", user.company_id)
     .order("date_start", { ascending: false })
     .limit(50);
 

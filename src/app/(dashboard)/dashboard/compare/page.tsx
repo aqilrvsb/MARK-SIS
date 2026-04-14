@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/actions";
-import { createClient } from "@/lib/supabase-server";
+import { createServiceClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 
 export default async function ComparePage({
@@ -12,7 +12,7 @@ export default async function ComparePage({
 
   const params = await searchParams;
   const period = params.period || "week";
-  const supabase = await createClient();
+  const admin = createServiceClient();
 
   const now = new Date();
   let currentStart: string, currentEnd: string, prevStart: string, prevEnd: string, periodLabel: string;
@@ -41,19 +41,21 @@ export default async function ComparePage({
     periodLabel = "This Week vs Last Week";
   }
 
-  // Fetch current period data
-  const { data: currentData } = await supabase
-    .from("ad_data")
-    .select("data")
-    .gte("date_start", currentStart)
-    .lte("date_end", currentEnd);
-
-  // Fetch previous period data
-  const { data: prevData } = await supabase
-    .from("ad_data")
-    .select("data")
-    .gte("date_start", prevStart)
-    .lte("date_end", prevEnd);
+  // Fetch current and previous period data in parallel
+  const [{ data: currentData }, { data: prevData }] = await Promise.all([
+    admin
+      .from("ad_data")
+      .select("data")
+      .eq("company_id", user.company_id)
+      .gte("date_start", currentStart)
+      .lte("date_end", currentEnd),
+    admin
+      .from("ad_data")
+      .select("data")
+      .eq("company_id", user.company_id)
+      .gte("date_start", prevStart)
+      .lte("date_end", prevEnd),
+  ]);
 
   function aggregate(rows: { data: Record<string, unknown> }[] | null) {
     let spend = 0, impressions = 0, clicks = 0, leads = 0, purchases = 0, revenue = 0;

@@ -1,13 +1,13 @@
 import { getCurrentUser } from "@/lib/actions";
-import { createClient } from "@/lib/supabase-server";
+import { createServiceClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 
 export default async function HealthPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const supabase = await createClient();
-  const { data: adData } = await supabase.from("ad_data").select("data");
+  const admin = createServiceClient();
+  const { data: adData } = await admin.from("ad_data").select("data").eq("company_id", user.company_id);
 
   // Calculate health metrics per campaign
   const campaignHealth = new Map<string, {

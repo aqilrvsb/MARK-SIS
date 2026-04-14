@@ -1,31 +1,35 @@
 import { getCurrentUser } from "@/lib/actions";
-import { createClient } from "@/lib/supabase-server";
+import { createServiceClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 
 export default async function ScorecardPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const supabase = await createClient();
+  const admin = createServiceClient();
 
-  let query = supabase
+  // For leaders, fetch team members in parallel with scores
+  let teamIds: string[] | null = null;
+  if (user.role === "leader") {
+    const { data: teamMembers } = await admin
+      .from("users")
+      .select("id")
+      .eq("company_id", user.company_id)
+      .or(`id.eq.${user.id},leader_id.eq.${user.id}`);
+    teamIds = (teamMembers || []).map((m) => m.id);
+  }
+
+  let query = admin
     .from("marketer_scores")
     .select("*, users:marketer_id(id, full_name, role, leader_id)")
+    .eq("company_id", user.company_id)
     .order("total_spend", { ascending: false });
 
   // Role-based filtering
   if (user.role === "marketer") {
     query = query.eq("marketer_id", user.id);
-  } else if (user.role === "leader") {
-    // Leader sees their own team marketers + themselves
-    const { data: teamMembers } = await supabase
-      .from("users")
-      .select("id")
-      .or(`id.eq.${user.id},leader_id.eq.${user.id}`);
-    const teamIds = (teamMembers || []).map((m) => m.id);
-    if (teamIds.length > 0) {
-      query = query.in("marketer_id", teamIds);
-    }
+  } else if (user.role === "leader" && teamIds && teamIds.length > 0) {
+    query = query.in("marketer_id", teamIds);
   }
   // BOD sees all — no additional filter
 

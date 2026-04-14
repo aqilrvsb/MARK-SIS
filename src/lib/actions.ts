@@ -187,32 +187,23 @@ export async function logout() {
 // USER ACTIONS
 // ============================================
 
-// Cached per-request — won't re-fetch during same render
+// Cached per-request — single DB call, no fallback needed
 export const getCurrentUser = cache(async (): Promise<UserProfile | null> => {
+  const admin = createServiceClient();
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  // Try with user's session first
-  const { data } = await supabase
+  // Use service role — always works, no RLS issues, single call
+  const { data } = await admin
     .from("users")
     .select("*")
     .eq("id", user.id)
     .single();
 
-  if (data) return data;
-
-  // Fallback: use service role (bypasses RLS)
-  const admin = createServiceClient();
-  const { data: adminData } = await admin
-    .from("users")
-    .select("*")
-    .eq("id", user.id)
-    .single();
-
-  return adminData;
+  return data;
 });
 
 export async function createTeamMember(formData: FormData) {
@@ -311,14 +302,14 @@ export async function deleteTeamMember(userId: string) {
 // ============================================
 
 export async function getTeamMembers() {
-  const supabase = await createClient();
+  const admin = createServiceClient();
   const currentUser = await getCurrentUser();
   if (!currentUser) return [];
 
-  let query = supabase.from("users").select("*").eq("company_id", currentUser.company_id);
+  let query = admin.from("users").select("*").eq("company_id", currentUser.company_id);
 
   if (currentUser.role === "leader") {
-    query = supabase
+    query = admin
       .from("users")
       .select("*")
       .eq("company_id", currentUser.company_id)
@@ -330,11 +321,11 @@ export async function getTeamMembers() {
 }
 
 export async function getLeaders() {
-  const supabase = await createClient();
+  const admin = createServiceClient();
   const currentUser = await getCurrentUser();
   if (!currentUser) return [];
 
-  const { data } = await supabase
+  const { data } = await admin
     .from("users")
     .select("*")
     .eq("company_id", currentUser.company_id)

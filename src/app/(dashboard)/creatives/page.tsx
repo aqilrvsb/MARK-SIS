@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/actions";
-import { createClient } from "@/lib/supabase-server";
+import { createServiceClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 
 interface CreativeGroup {
@@ -19,9 +19,9 @@ export default async function CreativesPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const supabase = await createClient();
+  const admin = createServiceClient();
 
-  const { data: adData } = await supabase.from("ad_data").select("data");
+  const { data: adData } = await admin.from("ad_data").select("data").eq("company_id", user.company_id);
 
   // Group by creative title and aggregate metrics
   const creativeMap = new Map<string, CreativeGroup>();
