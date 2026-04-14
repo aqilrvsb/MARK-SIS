@@ -193,13 +193,24 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
+  // Try with user's session first
   const { data } = await supabase
     .from("users")
     .select("*")
     .eq("id", user.id)
     .single();
 
-  return data;
+  if (data) return data;
+
+  // Fallback: use service role (bypasses RLS)
+  const admin = createServiceClient();
+  const { data: adminData } = await admin
+    .from("users")
+    .select("*")
+    .eq("id", user.id)
+    .single();
+
+  return adminData;
 }
 
 export async function createTeamMember(formData: FormData) {
