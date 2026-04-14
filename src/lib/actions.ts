@@ -3,6 +3,7 @@
 import { createClient, createServiceClient } from "./supabase-server";
 import { redirect } from "next/navigation";
 import { UserProfile } from "./types";
+import { cache } from "react";
 
 // ============================================
 // STAFF ID GENERATION
@@ -186,7 +187,8 @@ export async function logout() {
 // USER ACTIONS
 // ============================================
 
-export async function getCurrentUser(): Promise<UserProfile | null> {
+// Cached per-request — won't re-fetch during same render
+export const getCurrentUser = cache(async (): Promise<UserProfile | null> => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -211,7 +213,7 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
     .single();
 
   return adminData;
-}
+});
 
 export async function createTeamMember(formData: FormData) {
   const admin = createServiceClient();
