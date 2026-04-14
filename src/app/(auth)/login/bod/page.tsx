@@ -23,11 +23,22 @@ export default function BODLoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left — Branding */}
-      <div className="hidden lg:flex lg:w-1/2 animated-gradient relative items-center justify-center p-12">
-        <div className="absolute inset-0 bg-black/20" />
+      <div className="hidden lg:flex lg:w-1/2 animated-gradient relative items-center justify-center p-12 overflow-hidden">
+        <div className="absolute inset-0 bg-black/10" />
+        <div className="absolute inset-0 mesh-gradient-overlay" />
+        {/* Particles */}
+        <div className="particle particle-1" style={{ top: "20%", left: "15%" }} />
+        <div className="particle particle-2" style={{ top: "60%", left: "25%" }} />
+        <div className="particle particle-3" style={{ top: "40%", right: "20%" }} />
+        <div className="particle particle-4" style={{ top: "75%", right: "30%" }} />
+        <div className="particle particle-5" style={{ top: "30%", left: "60%" }} />
+        <div className="particle particle-1" style={{ top: "85%", left: "45%" }} />
+        <div className="particle particle-2" style={{ top: "15%", right: "15%" }} />
+        <div className="particle particle-4" style={{ top: "50%", left: "40%" }} />
+
         <div className="relative z-10 text-white max-w-md">
-          <div className="text-5xl font-black tracking-tight mb-6">MARK-SIS</div>
-          <p className="text-2xl font-light text-white/90 leading-relaxed">
+          <div className="text-5xl font-black tracking-tight mb-6 text-glow">Hack Data</div>
+          <p className="text-2xl font-light text-white/90 leading-relaxed text-glow">
             Company Admin Portal
           </p>
           <p className="text-white/60 mt-4 text-sm leading-relaxed">
@@ -38,10 +49,10 @@ export default function BODLoginPage() {
       </div>
 
       {/* Right — Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
+      <div className="flex-1 flex items-center justify-center p-8 bg-[#faf9ff]">
         <div className="w-full max-w-md animate-fade-up">
           <div className="text-center mb-8">
-            <div className="lg:hidden text-3xl font-black text-gradient mb-2">MARK-SIS</div>
+            <div className="lg:hidden text-3xl font-black text-gradient mb-2">Hack Data</div>
             <h1 className="text-2xl font-bold text-gray-900">Company Login</h1>
             <p className="text-gray-500 mt-1">For Board of Directors</p>
           </div>
@@ -84,7 +95,7 @@ export default function BODLoginPage() {
 
           <p className="text-center text-sm text-gray-500 mt-8">
             Staff member?{" "}
-            <Link href="/login" className="text-indigo-600 font-semibold hover:text-indigo-700">
+            <Link href="/login" className="text-purple-600 font-semibold hover:text-pink-500 transition-colors">
               Staff Login
             </Link>
           </p>

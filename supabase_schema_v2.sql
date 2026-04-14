@@ -1,5 +1,5 @@
 -- ============================================
--- MARK-SIS v2: Full Schema with KPI, Alerts, Brands, Scores
+-- Hack Data v2: Full Schema with KPI, Alerts, Brands, Scores
 -- Run this in Supabase SQL Editor AFTER v1 schema
 -- ============================================
 

@@ -2,10 +2,18 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white overflow-hidden">
+    <div className="min-h-screen bg-[#0a0818] text-white overflow-hidden">
+      {/* Floating Orbs */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="orb-1 absolute top-[10%] left-[15%] w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-[120px]" />
+        <div className="orb-2 absolute top-[50%] right-[10%] w-[400px] h-[400px] bg-pink-500/12 rounded-full blur-[100px]" />
+        <div className="orb-3 absolute bottom-[10%] left-[40%] w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[140px]" />
+        <div className="orb-4 absolute top-[30%] right-[35%] w-[300px] h-[300px] bg-fuchsia-500/10 rounded-full blur-[80px]" />
+      </div>
+
       {/* Nav */}
       <nav className="relative z-10 flex items-center justify-between px-8 py-5 max-w-7xl mx-auto">
-        <div className="text-2xl font-black tracking-tight text-gradient">MARK-SIS</div>
+        <div className="text-2xl font-black tracking-tight text-gradient-animated">Hack Data</div>
         <div className="flex gap-4">
           <Link href="/login" className="btn-premium px-5 py-2 text-sm font-bold rounded-lg">
             Login
@@ -15,28 +23,24 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="relative px-8 pt-16 pb-32 max-w-7xl mx-auto">
-        {/* Background glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-indigo-500/20 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute top-20 right-0 w-[400px] h-[400px] bg-purple-500/15 rounded-full blur-[100px] pointer-events-none" />
-
         <div className="relative z-10 text-center max-w-4xl mx-auto">
-          <div className="inline-block px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold mb-6 tracking-wide">
+          <div className="inline-block px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold mb-6 tracking-wide backdrop-blur-sm">
             MARKETING INTELLIGENCE PLATFORM
           </div>
           <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-tight mb-6">
             Turn Facebook Ads
             <br />
-            <span className="text-gradient">into Growth</span>
+            <span className="text-gradient-animated text-glow">into Growth</span>
           </h1>
-          <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-lg md:text-xl text-white/50 max-w-2xl mx-auto mb-10 leading-relaxed">
             Import 238+ metrics from Facebook Ads Manager. Track team performance.
             Set KPI targets. Get automated alerts. All in one beautiful dashboard.
           </p>
           <div className="flex gap-4 justify-center">
-            <Link href="/register" className="btn-premium px-8 py-3.5 text-sm font-bold rounded-xl">
+            <Link href="/register" className="btn-premium px-8 py-3.5 text-sm font-bold rounded-xl pulse-glow">
               Get Started Free
             </Link>
-            <Link href="/login" className="px-8 py-3.5 text-sm font-semibold rounded-xl border border-white/20 hover:bg-white/5 transition">
+            <Link href="/login" className="px-8 py-3.5 text-sm font-semibold rounded-xl border border-white/15 hover:bg-white/5 hover:border-purple-500/30 transition-all duration-300 backdrop-blur-sm">
               View Demo
             </Link>
           </div>
@@ -78,9 +82,10 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 px-8 py-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-between text-sm text-white/40">
-          <span>MARK-SIS Marketing Intelligence</span>
+      <footer className="relative z-10 px-8 py-8">
+        <div className="gradient-accent-line mb-8" />
+        <div className="max-w-7xl mx-auto flex items-center justify-between text-sm text-white/30">
+          <span className="text-gradient">Hack Data Marketing Intelligence</span>
           <span>Built for performance marketers</span>
         </div>
       </footer>
@@ -90,10 +95,10 @@ export default function HomePage() {
 
 function FeatureCard({ icon, title, desc }: { icon: string; title: string; desc: string }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/8 hover:border-indigo-500/30 transition-all duration-300 group">
-      <div className="text-3xl mb-4 group-hover:scale-110 transition-transform">{icon}</div>
-      <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
-      <p className="text-sm text-white/50 leading-relaxed">{desc}</p>
+    <div className="feature-card-glass rounded-2xl p-6 group cursor-default">
+      <div className="text-3xl mb-4 group-hover:scale-110 transition-transform duration-300">{icon}</div>
+      <h3 className="text-lg font-bold text-white mb-2 group-hover:text-gradient">{title}</h3>
+      <p className="text-sm text-white/40 leading-relaxed group-hover:text-white/55 transition-colors duration-300">{desc}</p>
     </div>
   );
 }

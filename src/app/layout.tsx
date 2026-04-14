@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MARK-SIS — Marketing Reporting System",
+  title: "Hack Data — Marketing Reporting System",
   description: "Marketing reporting system with role-based access for BOD, Leaders, and Marketers",
+  icons: { icon: "/favicon.svg" },
 };
 
 export default function RootLayout({

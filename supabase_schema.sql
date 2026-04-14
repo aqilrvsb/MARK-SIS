@@ -1,5 +1,5 @@
 -- ============================================
--- MARK-SIS: Marketing Reporting System Schema
+-- Hack Data: Marketing Reporting System Schema
 -- Run this in Supabase SQL Editor
 -- ============================================
 

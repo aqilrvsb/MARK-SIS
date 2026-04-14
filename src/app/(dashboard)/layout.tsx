@@ -29,7 +29,7 @@ export default async function DashboardLayout({
         {/* Logo */}
         <div className="px-6 py-5 border-b border-white/10">
           <Link href="/dashboard" className="text-xl font-black tracking-tight text-gradient">
-            MARK-SIS
+            Hack Data
           </Link>
         </div>
 

@@ -36,7 +36,7 @@ export default function TeamClient({ currentUser, members, leaders }: Props) {
     const formData = new FormData(e.currentTarget);
     // Auto-generate email from staff ID
     const staffId = (formData.get("id_staff") as string).toUpperCase().trim();
-    formData.set("email", `${staffId.toLowerCase().replace(/[^a-z0-9]/g, "")}@staff.marksis.app`);
+    formData.set("email", `${staffId.toLowerCase().replace(/[^a-z0-9]/g, "")}@staff.hackdata.app`);
     const result = await createTeamMember(formData);
     if (result?.error) {
       setError(result.error);

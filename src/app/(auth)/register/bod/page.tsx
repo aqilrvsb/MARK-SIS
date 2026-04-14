@@ -25,28 +25,39 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left — Branding */}
-      <div className="hidden lg:flex lg:w-1/2 animated-gradient relative items-center justify-center p-12">
-        <div className="absolute inset-0 bg-black/20" />
+      <div className="hidden lg:flex lg:w-1/2 animated-gradient relative items-center justify-center p-12 overflow-hidden">
+        <div className="absolute inset-0 bg-black/10" />
+        <div className="absolute inset-0 mesh-gradient-overlay" />
+        {/* Particles */}
+        <div className="particle particle-1" style={{ top: "20%", left: "15%" }} />
+        <div className="particle particle-2" style={{ top: "60%", left: "25%" }} />
+        <div className="particle particle-3" style={{ top: "40%", right: "20%" }} />
+        <div className="particle particle-4" style={{ top: "75%", right: "30%" }} />
+        <div className="particle particle-5" style={{ top: "30%", left: "60%" }} />
+        <div className="particle particle-1" style={{ top: "85%", left: "45%" }} />
+        <div className="particle particle-2" style={{ top: "15%", right: "15%" }} />
+        <div className="particle particle-4" style={{ top: "50%", left: "40%" }} />
+
         <div className="relative z-10 text-white max-w-md">
-          <div className="text-4xl font-black tracking-tight mb-4">MARK-SIS</div>
-          <p className="text-xl font-light text-white/90 mb-8">
+          <div className="text-4xl font-black tracking-tight mb-4 text-glow">Hack Data</div>
+          <p className="text-xl font-light text-white/90 mb-8 text-glow">
             The marketing intelligence platform that transforms your Facebook Ads data into actionable insights.
           </p>
           <div className="space-y-4 text-sm text-white/80">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-lg">&#9776;</div>
+              <div className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center text-lg">&#9776;</div>
               <span>238+ metrics from Facebook Ads Manager</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-lg">&#9733;</div>
+              <div className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center text-lg">&#9733;</div>
               <span>KPI targets with real-time scoring</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-lg">&#9888;</div>
+              <div className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center text-lg">&#9888;</div>
               <span>Automated alerts for budget & performance</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-lg">&#128101;</div>
+              <div className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center text-lg">&#128101;</div>
               <span>Team management with role-based access</span>
             </div>
           </div>
@@ -54,10 +65,10 @@ export default function RegisterPage() {
       </div>
 
       {/* Right — Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
+      <div className="flex-1 flex items-center justify-center p-8 bg-[#faf9ff]">
         <div className="w-full max-w-md animate-fade-up">
           <div className="text-center mb-8">
-            <div className="lg:hidden text-3xl font-black text-gradient mb-2">MARK-SIS</div>
+            <div className="lg:hidden text-3xl font-black text-gradient mb-2">Hack Data</div>
             <h1 className="text-2xl font-bold text-gray-900">Create your account</h1>
             <p className="text-gray-500 mt-1">Start tracking your marketing performance</p>
           </div>
@@ -111,7 +122,7 @@ export default function RegisterPage() {
 
           <p className="text-center text-sm text-gray-500 mt-8">
             Already have an account?{" "}
-            <Link href="/login" className="text-indigo-600 font-semibold hover:text-indigo-700">
+            <Link href="/login" className="text-purple-600 font-semibold hover:text-pink-500 transition-colors">
               Sign in
             </Link>
           </p>

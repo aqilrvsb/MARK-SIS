@@ -84,7 +84,7 @@ export default async function SharedDashboardPage({ params }: { params: Promise<
       <nav className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold text-blue-600">MARK-SIS</h1>
+            <h1 className="text-lg font-bold text-blue-600">Hack Data</h1>
             <p className="text-xs text-gray-500">Shared Report for {share.client_name}</p>
           </div>
           <span className="text-sm text-gray-500">{companyName}</span>
@@ -141,7 +141,7 @@ export default async function SharedDashboardPage({ params }: { params: Promise<
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-8">
-          Powered by MARK-SIS Marketing Reporting System
+          Powered by Hack Data Marketing Reporting System
         </p>
       </main>
     </div>
